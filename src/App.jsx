@@ -6,23 +6,38 @@ import './index.css'
 
 const TURNS = {
   X: '×',
-  O: 'O',
+  O: 'o',
 }
 
+//componente - cuadros de juego
 const Square = ({ children, isSelected, updateBoard, index }) => {
+  
   const className = `square ${isSelected ? 'is-selected' : ''}`
 
+  const handleClick = () => {
+    updateBoard(index)
+  }
+
   return (
-    <div className={className}>
+    <div onClick={handleClick} className={className}>
       {children}
     </div>
   )
 }
 
+//aplicación del propio juego
 function App() {
-  const [board, setBoard] = useState(Array(9).fill(null))
 
+  const [board, setBoard] = useState(Array(9).fill(null))
   const [turn, setTurn] = useState(TURNS.X)
+  
+  const updateBoard = (index) => {
+    const newBoard = [...board]
+    newBoard[index] = turn // X ó O como valor para cada Index
+    setBoard(newBoard)
+    const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X
+    setTurn(newTurn)
+  }
 
   return (
     <main className='board'>
@@ -31,11 +46,8 @@ function App() {
         {
           board.map((_, index) => {
             return (
-              <Square
-                key={index}
-                index={index}
-              >
-                {index}
+              <Square key={index} index={index} updateBoard={updateBoard}>
+                {board[index]}
               </Square>
             )
           })
