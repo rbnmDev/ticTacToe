@@ -55,6 +55,16 @@ function App() {
     return null
   }
 
+  const resetGame = () => {
+    setBoard(Array(9).fill(null))
+    setTurn(TURNS.X)
+    setWinner(null)
+  }
+
+
+  const checkEndGame = (newBoard) => {
+    return newBoard.every((square) => square !== null)
+  }
   const updateBoard = (index) => {
     if (board[index] || winner) return
 
@@ -66,22 +76,25 @@ function App() {
     const newWinner = checkWinner(newBoard)
     if (newWinner) {
       setWinner(newWinner)
+    } else if (checkEndGame(newBoard)) {
+      setWinner(false)
     }
   }
 
   return (
     <main className='board'>
       <h1>Tic - Tac - Toe</h1>
-      <section className='game'>
-        {
-          board.map((_, index) => {
-            return (
-              <Square key={index} index={index} updateBoard={updateBoard}>
-                {board[index]}
-              </Square>
-            )
-          })
-        }
+      <button onClick={resetGame}>Reiniciar</button>
+
+      <section className='game'>{
+        board.map((square, index) => {
+          return (
+            <Square key={index} index={index} updateBoard={updateBoard}>
+              {square}
+            </Square>
+          )
+        })
+      }
       </section>
 
       <section className='turn'>
@@ -91,6 +104,25 @@ function App() {
         <Square isSelected={turn === TURNS.O} className='turnO'>
           {TURNS.O}
         </Square>
+      </section>
+
+      <section className='winnerEnd'>{
+        winner !== null && (
+          <section className='winner'>
+            <div className='text'>
+              <h2>
+                {winner === false ? 'Empate' : 'Ha ganado'}
+              </h2>
+              <header>
+                {winner && <Square>{winner}</Square>}
+              </header>
+              <footer>
+                <button onClick={resetGame}>Reiniciar</button>
+              </footer>
+            </div>
+          </section>
+        )
+      }
       </section>
     </main>
   )
