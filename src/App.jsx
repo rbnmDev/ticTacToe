@@ -1,39 +1,9 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './index.css'
+import confetti from "canvas-confetti"
+import Square from './components/Square.jsx'
+import { WINNER_COMBOS, TURNS } from './constants.js'
 
-const TURNS = {
-  X: '×',
-  O: 'o',
-}
-
-//componente - cuadros de juego
-const Square = ({ children, isSelected, updateBoard, index }) => {
-
-  const className = `square ${isSelected ? 'is-selected' : ''}`
-
-  const handleClick = () => {
-    updateBoard(index)
-  }
-
-  return (
-    <div onClick={handleClick} className={className}>
-      {children}
-    </div>
-  )
-}
-
-const WINNER_COMBOS = [
-  [0, 1, 2],
-  [3, 4, 5],
-  [6, 7, 8],
-  [0, 3, 6],
-  [1, 4, 7],
-  [2, 5, 8],
-  [0, 4, 8],
-  [2, 4, 6],
-]
 
 //aplicación del propio juego
 function App() {
@@ -75,6 +45,7 @@ function App() {
     setTurn(newTurn)
     const newWinner = checkWinner(newBoard)
     if (newWinner) {
+      confetti()
       setWinner(newWinner)
     } else if (checkEndGame(newBoard)) {
       setWinner(false)
@@ -111,7 +82,7 @@ function App() {
           <section className='winner'>
             <div className='text'>
               <h2>
-                {winner === false ? 'Empate' : 'Ha ganado'}
+                {winner === false ? 'EMPATE' : 'GANADOR'}
               </h2>
               <header>
                 {winner && <Square>{winner}</Square>}
