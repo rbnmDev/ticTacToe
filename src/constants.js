@@ -13,60 +13,59 @@ const WINNER_COMBOS = [
   [0, 4, 8],
   [2, 4, 6],
 ]
-
-
-export const minimax = (board, depth, isMaximizing, player, opponent) => {
-  if (checkWinner(board, player)) {
-    return 10 - depth;
-  } else if (checkWinner(board, opponent)) {
-    return depth - 10;
-  } else if (checkTie(board)) {
-    return 0;
-  }
-
-  if (isMaximizing) {
-    let maxEval = -Infinity;
-    let bestMove = -1;
-
-    for (let i = 0; i < board.length; i++) {
-      if (board[i] === null) {
-        board[i] = player;
-        let evaluation = minimax(board, depth + 1, false, player, opponent);
-        board[i] = null;
-
-        if (evaluation > maxEval) {
-          maxEval = evaluation;
-          bestMove = i;
-        }
-      }
-    }
-
-    if (depth === 0) {
-      // Si estamos en el nivel superior, devuelve la mejor jugada
-      return bestMove;
-    }
-
-    return maxEval;
+  
+function score(game, depth, player, opponent) {
+  if (game.win(player)) {
+      return 10 - depth;
+  } else if (game.win(opponent)) {
+      return depth - 10;
   } else {
-    let minEval = Infinity;
-    let bestMove = -1;
-
-    for (let i = 0; i < board.length; i++) {
-      if (board[i] === null) {
-        board[i] = opponent;
-        let evaluation = minimax(board, depth + 1, true, player, opponent);
-        board[i] = null;
-
-        if (evaluation < minEval) {
-          minEval = evaluation;
-          bestMove = i;
-        }
-      }
-    }
-
-    return minEval;
+      return 0;
   }
-};
+}
+
+function minimax(game, depth, player, opponent) {
+  if (game.over()) {
+      return score(game, depth, player, opponent);
+  }
+
+  depth += 1;
+  const scores = [];
+  const moves = [];
+
+  const availableMoves = game.getAvailableMoves();
+  availableMoves.forEach((move) => {
+      const possibleGame = game.getNewState(move);
+      scores.push(minimax(possibleGame, depth, player, opponent));
+      moves.push(move);
+  });
+
+  if (game.activeTurn() === player) {
+      let maxScore = -Infinity;
+      let maxScoreIndex = -1;
+
+      for (let i = 0; i < scores.length; i++) {
+          if (scores[i] > maxScore) {
+              maxScore = scores[i];
+              maxScoreIndex = i;
+          }
+      }
+
+      return scores[maxScoreIndex];
+  } else {
+      let minScore = Infinity;
+      let minScoreIndex = -1;
+
+      for (let i = 0; i < scores.length; i++) {
+          if (scores[i] < minScore) {
+              minScore = scores[i];
+              minScoreIndex = i;
+          }
+      }
+
+      return scores[minScoreIndex];
+  }
+}
 
 
 
