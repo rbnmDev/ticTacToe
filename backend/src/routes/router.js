@@ -1,13 +1,8 @@
 import {Router} from 'express';
-
-import eventRouter from './eventRouter.js';
-import authRouter from './authRouter.js';
-import authMiddleware from '../middlewares/authMiddleware.js';
+import userRouter from './userRouter.js';
 
 const router = Router();
 
-router.use('/events',authMiddleware, eventRouter);
-
-router.use('/', authRouter);
+router.use('/', userRouter);
 
 export default router;

@@ -1,39 +1,39 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './index.css'
 import confetti from "canvas-confetti"
 import Square from './components/Square.jsx'
-import { WINNER_COMBOS, TURNS } from './constants.js'
+import { TURNS, minimax, checkWinner, checkTie } from './constants.js'
 
 
 //aplicación del propio juego
 function App() {
 
-  const [board, setBoard] = useState(Array(9).fill(null))
+  const [board, setBoard] = useState(Array(9).fill(null)) //El estado inicial puede ser un ternario con el localStorage
+  //const boardFromStorage = window.localStorage.getItem('board')
+  //return boardFromStorage ? JSON.parse(boardFromStorage) : Array(9).fill(null)
   const [turn, setTurn] = useState(TURNS.X)
   const [winner, setWinner] = useState(null)
-
-  const checkWinner = (boardToCheck) => {
-    for (const combo of WINNER_COMBOS) {
-      const [a, b, c] = combo
-      if (boardToCheck[a] && //0 -> X ó O
-        boardToCheck[a] === boardToCheck[b] && // 0 y 3 -> X -> X ó O -> O
-        boardToCheck[a] === boardToCheck[c] // 0
-      ) {
-        return boardToCheck[a]
-      }
-    }
-    return null
-  }
 
   const resetGame = () => {
     setBoard(Array(9).fill(null))
     setTurn(TURNS.X)
     setWinner(null)
+    //Si se almacena el juego en local storage, lo reseteamos también
+    //window.localStorage.removeItem('board')
+    //window.localStorage.removeItem('turn')
   }
-
 
   const checkEndGame = (newBoard) => {
     return newBoard.every((square) => square !== null)
+  }
+
+  const changeTurn = () => {
+    setTurn(turn === TURNS.X ? TURNS.O : TURNS.X)
+  }
+
+  const handleClick = (index) => {
+    if (turn === TURNS.O) return
+    updateBoard(index)
   }
   const updateBoard = (index) => {
     if (board[index] || winner) return
@@ -41,18 +41,41 @@ function App() {
     const newBoard = [...board]
     newBoard[index] = turn // X ó O como valor para cada Index
     setBoard(newBoard)
-    const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X
-    setTurn(newTurn)
+    changeTurn()
     const newWinner = checkWinner(newBoard)
     if (newWinner) {
-      confetti()
-      setWinner(newWinner)
-    } else if (checkEndGame(newBoard)) {
-      setWinner(false)
+      setTimeout(() => {
+
+        confetti()
+        console.log("winner", newWinner)
+        setWinner(newWinner)
+      }, 500)
+      return;
+    } else if (checkTie(newBoard)) {
+      setTimeout(() => {
+        setWinner(false)
+      }, 500)
+      return;
     }
   }
 
-  
+  const updateAI = () => {
+    if (winner) return
+
+    setTimeout(() => {
+
+      const index = minimax(board, 0, true, TURNS.O, TURNS.X)
+
+      updateBoard(index);
+    }, 700)
+  }
+
+  useEffect(() => {
+    if (turn === TURNS.O) {
+      updateAI()
+    }
+  }, [turn])
+
   return (
     <main className='board'>
       <h1>Tic - Tac - Toe</h1>
@@ -61,7 +84,7 @@ function App() {
       <section className='game'>{
         board.map((square, index) => {
           return (
-            <Square key={index} index={index} updateBoard={updateBoard}>
+            <Square key={index} index={index} updateBoard={handleClick}>
               {square}
             </Square>
           )
@@ -101,5 +124,10 @@ function App() {
 }
 
 export default App
+
+
+//window.localStorage.setItem("board", JSON.stringify(board))
+//window.localStorage.setItem("turn", newTurn)
+
 
 

@@ -2,7 +2,7 @@ version: '3'
 services:
   mongo:
     image: mongo:latest
-    container_name: tictactoe
+    container_name: tictactoe_mongo
     restart: always
     environment:
       MONGO_INITDB_DATABASE: ${DB_NAME}
@@ -12,7 +12,7 @@ services:
       - ./data/mongo:/data/db
   backend:
     build: ./backend
-    container_name: api-eventos
+    container_name: tictactoe_api
     restart: always
     ports:
       - ${APP_PORT}:3000

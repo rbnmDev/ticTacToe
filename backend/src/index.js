@@ -1,5 +1,4 @@
 import express from 'express';
-import eventController from './controllers/eventController.js';
 import cors from 'cors';
 import router from './routes/router.js';
 
@@ -9,10 +8,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.get('/', (req, res) => {
-    res.send('API eventos');
+    res.send('Soy tu backend!! Huye!!!');
 });
 
-app.use('/api', router);
+app.use('/', router);
 
 app.listen(3000, () => {
     console.log('Example app listening on port 3000!');
