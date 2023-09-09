@@ -10,6 +10,8 @@ import '/styles/index.css'
 function App() {
 
   const [route, setRoute] = useState('login');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
 
 
   const [board, setBoard] = useState(Array(9).fill(null)) //El estado inicial puede ser un ternario con el localStorage
