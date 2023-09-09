@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react'
-import './index.css'
 import confetti from "canvas-confetti"
-import Square from './components/Square.jsx'
-import { TURNS, minimax, checkWinner, checkTie } from './constants.js'
 
+import Square from './components/Square.jsx'
+import Login from './components/Login.jsx'
+import { TURNS, minimax, checkWinner, checkTie } from './constants.js'
+import '/styles/index.css'
 
 //aplicación del propio juego
 function App() {
+
+  const [route, setRoute] = useState('login');
+
 
   const [board, setBoard] = useState(Array(9).fill(null)) //El estado inicial puede ser un ternario con el localStorage
   //const boardFromStorage = window.localStorage.getItem('board')
@@ -77,53 +81,67 @@ function App() {
   }, [turn])
 
   return (
-    <main className='board'>
-      <h1>Tic - Tac - Toe</h1>
-      <button onClick={resetGame}>Reiniciar</button>
+    <>
+      {route === "home" ? (
+        <main className='board'>
+          <h1>{User.userName}</h1>
 
-      <section className='game'>{
-        board.map((square, index) => {
-          return (
-            <Square key={index} index={index} updateBoard={handleClick}>
-              {square}
-            </Square>
-          )
-        })
-      }
-      </section>
 
-      <section className='turn'>
-        <Square isSelected={turn === TURNS.X} className='turnX'>
-          {TURNS.X}
-        </Square>
-        <Square isSelected={turn === TURNS.O} className='turnO'>
-          {TURNS.O}
-        </Square>
-      </section>
-
-      <section className='winnerEnd'>{
-        winner !== null && (
-          <section className='winner'>
-            <div className='text'>
-              <h2>
-                {winner === false ? 'EMPATE' : 'GANADOR'}
-              </h2>
-              <header>
-                {winner && <Square>{winner}</Square>}
-              </header>
-              <footer>
-                <button onClick={resetGame}>Reiniciar</button>
-              </footer>
-            </div>
+          <section className='game'>{
+            board.map((square, index) => {
+              return (
+                <Square key={index} index={index} updateBoard={handleClick}>
+                  {square}
+                </Square>
+              )
+            })
+          }
           </section>
-        )
-      }
-      </section>
-    </main>
+
+          <section className='turn'>
+            <Square isSelected={turn === TURNS.X} className='turnX'>
+              {TURNS.X}
+            </Square>
+            <Square isSelected={turn === TURNS.O} className='turnO'>
+              {TURNS.O}
+            </Square>
+          </section>
+
+          <section className='winnerEnd'>{
+            winner !== null && (
+              <section className='winner'>
+                <div className='text'>
+                  <h2>
+                    {winner === false ? 'EMPATE' : 'GANADOR'}
+                  </h2>
+                  <header>
+                    {winner && <Square>{winner}</Square>}
+                  </header>
+                  <footer>
+                    <button onClick={resetGame}>Reiniciar</button>
+                  </footer>
+                </div>
+              </section>
+            )
+          }
+          </section>
+          <button onClick={resetGame}>Reiniciar</button>
+        </main>
+      ) : (
+        <Login
+          redirect={() => setRoute("home")}
+        />
+      )}
+    </>
   )
 }
 
 export default App
+
+
+//const [route, setRoute] = useState('login');
+
+
 
 
 //window.localStorage.setItem("board", JSON.stringify(board))
