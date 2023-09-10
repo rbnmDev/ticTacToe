@@ -1,6 +1,9 @@
+const pl1 = '🤪';
+const pl2 = '🐷';
+
 const TURNS = {
-    X: '🤪',
-    O: '🐷',
+    X: pl1,
+    O: pl2,
   }
   
   const WINNER_COMBOS = [
@@ -21,7 +24,8 @@ const TURNS = {
         boardToCheck[a] === boardToCheck[b] && // 0 y 3 -> X -> X ó O -> O
         boardToCheck[a] === boardToCheck[c] // 0
       ) {
-        return boardToCheck[a]
+        const winner = boardToCheck[a]
+        return winner
       }
     }
     return null
@@ -36,9 +40,9 @@ const TURNS = {
     const board = [...originalBoard];
   
     if (checkWinner(board) === player) {
-      return 10 - depth;
+      return 5 - depth;
     } else if (checkWinner(board) === opponent) {
-      return depth - 10;
+      return depth - 5;
     } else if (checkTie(board)) {
       return 0;
     }

@@ -1,153 +1,161 @@
-import { useEffect, useState } from 'react'
-import confetti from "canvas-confetti"
+// App.jsx
 
-import Square from './components/Square.jsx'
-import Login from './components/Login.jsx'
-import { TURNS, minimax, checkWinner, checkTie } from './constants.js'
-import '/styles/index.css'
+import React, { useEffect, useState } from "react";
+import confetti from "canvas-confetti";
 
-//aplicación del propio juego
+import Square from "./components/Square.jsx";
+import Login from "./components/Login.jsx";
+import { backend_url } from "./config.js";
+import { TURNS, minimax, checkWinner, checkTie } from "./constants.js";
+import "/styles/index.css";
+
 function App() {
-
-  const [route, setRoute] = useState('login');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const [board, setBoard] = useState(Array(9).fill(null));
+  const [turn, setTurn] = useState(TURNS.X);
+  const [winner, setWinner] = useState(null);
 
-
-  const [board, setBoard] = useState(Array(9).fill(null)) //El estado inicial puede ser un ternario con el localStorage
-  //const boardFromStorage = window.localStorage.getItem('board')
-  //return boardFromStorage ? JSON.parse(boardFromStorage) : Array(9).fill(null)
-  const [turn, setTurn] = useState(TURNS.X)
-  const [winner, setWinner] = useState(null)
+  const [totalGames, setTotalGames] = useState(0);
+  const [score, setScore] = useState(0);
 
   const resetGame = () => {
-    setBoard(Array(9).fill(null))
-    setTurn(TURNS.X)
-    setWinner(null)
-    //Si se almacena el juego en local storage, lo reseteamos también
-    //window.localStorage.removeItem('board')
-    //window.localStorage.removeItem('turn')
-  }
+    setBoard(Array(9).fill(null));
+    setTurn(TURNS.X);
+    setWinner(null);
+  };
 
   const checkEndGame = (newBoard) => {
-    return newBoard.every((square) => square !== null)
-  }
+    return newBoard.every((square) => square !== null);
+  };
 
   const changeTurn = () => {
-    setTurn(turn === TURNS.X ? TURNS.O : TURNS.X)
-  }
+    setTurn(turn === TURNS.X ? TURNS.O : TURNS.X);
+  };
 
   const handleClick = (index) => {
-    if (turn === TURNS.O) return
-    updateBoard(index)
-  }
-  const updateBoard = (index) => {
-    if (board[index] || winner) return
+    if (turn === TURNS.O) return;
+    updateBoard(index);
+  };
 
-    const newBoard = [...board]
-    newBoard[index] = turn // X ó O como valor para cada Index
-    setBoard(newBoard)
-    changeTurn()
-    const newWinner = checkWinner(newBoard)
+  const updateBoard = (index) => {
+    if (board[index] || winner) return;
+
+    const newBoard = [...board];
+    newBoard[index] = turn;
+    setBoard(newBoard);
+    changeTurn();
+    const newWinner = checkWinner(newBoard);
+    
     if (newWinner) {
       setTimeout(() => {
-
-        confetti()
-        console.log("winner", newWinner)
-        setWinner(newWinner)
-      }, 500)
+        handleGameEnd(winner)
+        confetti();
+        setWinner(newWinner);
+        
+      }, 1000);
       return;
     } else if (checkTie(newBoard)) {
       setTimeout(() => {
-        setWinner(false)
-      }, 500)
+        setWinner(false);
+
+      }, 1000);
       return;
     }
-  }
+  };
 
   const updateAI = () => {
-    if (winner) return
+    if (winner) return;
 
     setTimeout(() => {
-
-      const index = minimax(board, 0, true, TURNS.O, TURNS.X)
-
+      const index = minimax(board, 0, true, TURNS.O, TURNS.X);
       updateBoard(index);
-    }, 700)
-  }
+    }, 700);
+  };
 
   useEffect(() => {
     if (turn === TURNS.O) {
-      updateAI()
+      updateAI();
     }
-  }, [turn])
+  }, [turn]);
+
+
+  const handleGameEnd = async (winner) => {
+    const userUpdate = {
+      totalGames: totalGames + 1,
+      score: winner === TURNS.X ? score + 2 : winner === false ? score + 1 : score + 0
+    };
+    try {
+      const response = await fetch(`${backend_url}/addScore`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userUpdate),
+      });
+      if (!response.ok) {
+        console.error("Me gusta monton el tuerking");
+      } else {
+        console.log("Datos del usuario actualizados con éxito en el servidor.");
+      }
+    } catch (error) {
+      console.error("Error al enviar la solicitud al servidor:", error);
+    }
+  };
+
+
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
+  };
 
   return (
     <>
-      {route === "home" ? (
-        <main className='board'>
-          <h1>{User.userName}</h1>
+      {isLoggedIn ? (
+        <main className="board">
+          <h2 id="userName">{"userName"}</h2>
+          <h4 id="score">Score: {"score"}</h4>
+          <h4 id="rank">Ranking: {"rank"}</h4>
 
-
-          <section className='game'>{
-            board.map((square, index) => {
+          <section className="game">
+            {board.map((square, index) => {
               return (
                 <Square key={index} index={index} updateBoard={handleClick}>
                   {square}
                 </Square>
-              )
-            })
-          }
+              );
+            })}
           </section>
 
-          <section className='turn'>
-            <Square isSelected={turn === TURNS.X} className='turnX'>
+          <section className="turn">
+            <Square isSelected={turn === TURNS.X} className="turnX">
               {TURNS.X}
             </Square>
-            <Square isSelected={turn === TURNS.O} className='turnO'>
+            <Square isSelected={turn === TURNS.O} className="turnO">
               {TURNS.O}
             </Square>
           </section>
 
-          <section className='winnerEnd'>{
-            winner !== null && (
-              <section className='winner'>
-                <div className='text'>
-                  <h2>
-                    {winner === false ? 'EMPATE' : 'GANADOR'}
-                  </h2>
-                  <header>
-                    {winner && <Square>{winner}</Square>}
-                  </header>
+          <section className="winnerEnd">
+            {winner !== null && (
+              <section className="winner">
+                <div className="text">
+                  <h2>{winner === false ? "EMPATE" : "GANADOR"}</h2>
+
+                  <header>{winner && <Square>{winner}</Square>}</header>
                   <footer>
                     <button onClick={resetGame}>Reiniciar</button>
                   </footer>
                 </div>
               </section>
-            )
-          }
+            )}
           </section>
           <button onClick={resetGame}>Reiniciar</button>
         </main>
       ) : (
-        <Login
-          redirect={() => setRoute("home")}
-        />
+        <Login onLoginSuccess={handleLoginSuccess} />
       )}
     </>
-  )
+  );
 }
 
-export default App
-
-
-//const [route, setRoute] = useState('login');
-
-
-
-
-//window.localStorage.setItem("board", JSON.stringify(board))
-//window.localStorage.setItem("turn", newTurn)
-
-
-
+export default App;

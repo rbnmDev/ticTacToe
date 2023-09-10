@@ -48,5 +48,6 @@ dist-ssr
 *.sw?
 
 frontend/src/assets/esqOP/
+data/
 
 data
