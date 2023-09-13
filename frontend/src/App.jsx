@@ -7,7 +7,7 @@ import "/styles/index.css";
 import Square from "./components/Square.jsx";
 import Login from "./components/Login.jsx";
 import Logout from "./components/Logout.jsx";
-import getTopScores from "./components/Rank.jsx";
+import Ranking from "./components/Rank.jsx";
 
 
 function App() {
@@ -124,7 +124,6 @@ function App() {
   };
 
 
-
   //COMPONENTE PRINCIPAL DE LA APP
   return (
     <>
@@ -175,14 +174,13 @@ function App() {
 
           <section className="buttons__area">
             <button onClick={resetGame}>Reiniciar</button>
-            <Logout> </Logout>
+            <Logout/>
           </section>
 
           {/************* SECCIÓN DEL RANKING *************/}
-          <section id="Ranking">
-            <h2>Ranking</h2>
-            <ul></ul>
-          </section>
+
+          <Ranking/>
+
         </main>
       ) : (
         <Login onLoginSuccess={handleLoginSuccess} />

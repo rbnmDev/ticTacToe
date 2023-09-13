@@ -22,7 +22,7 @@ const login = async (req, res) => {
           totalGames: 0,
         },
         process.env.JWT_SECRET,
-        { expiresIn: "" }
+        { expiresIn: "1d" }
       );
       return res
         .status(200)
@@ -56,9 +56,7 @@ const addScore = async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: "Usuario no encontrado" });
     }
-
     console.log("score", score);
-
     user.score += score;
     user.totalGames += 1;
     await user.save();
@@ -72,9 +70,9 @@ const addScore = async (req, res) => {
 
 const getTopScores = async (req, res) => {
   try {
-    let users = await User.find().sort({ score: -1 }).limit(5);
+    let users = await User.find().sort({ score: -1, totalGames: 1 }).limit(5);
     users = users.map((user) => {
-      return { userName: user.userName, score: user.score };
+      return { userName: user.userName, score: user.score, totalGames: user.totalGames };
     });
     return res.status(200).json(users);
   } catch (error) {
