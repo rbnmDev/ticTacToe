@@ -1,3 +1,6 @@
+
+
+
 const pl1 = "🤪";
 const pl2 = "🐷";
 
@@ -46,9 +49,9 @@ export const minimax = (
   const board = [...originalBoard];
 
   if (checkWinner(board) === player) {
-    return 5 - depth;
+    return 7 - depth;
   } else if (checkWinner(board) === opponent) {
-    return depth - 5;
+    return depth - 7;
   } else if (checkTie(board)) {
     return 0;
   }

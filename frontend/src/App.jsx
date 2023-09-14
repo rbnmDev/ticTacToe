@@ -25,17 +25,12 @@ function App() {
 
   const [gameEnded, setGameEnded] = useState(false);
 
-  const [topScores, setTopScores] = useState([]);
 
   const resetGame = () => {
     setBoard(Array(9).fill(null));
     setTurn(TURNS.X);
     setWinner(null);
     setGameEnded(false);
-  };
-
-  const checkEndGame = (newBoard) => {
-    return newBoard.every((square) => square !== null);
   };
 
   const changeTurn = () => {
@@ -174,17 +169,21 @@ function App() {
 
           <section className="buttons__area">
             <button onClick={resetGame}>Reiniciar</button>
-            <Logout/>
+            <Logout />
           </section>
-
-          {/************* SECCIÓN DEL RANKING *************/}
-
-          <Ranking/>
 
         </main>
       ) : (
-        <Login onLoginSuccess={handleLoginSuccess} />
+        <>
+
+          <Login onLoginSuccess={handleLoginSuccess} />
+
+        </>
       )}
+      {/************* SECCIÓN DEL RANKING *************/}
+
+      <Ranking key={winner} />
+
     </>
   );
 }
