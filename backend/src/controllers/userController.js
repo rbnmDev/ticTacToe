@@ -9,9 +9,9 @@ const login = async (req, res) => {
   const { userName, password } = req.body;
   try {
     let oldUser = await User.findOne({ userName });
-    console.log(oldUser, password);
+    console.log("El que no se console.log(es por que OLDUSER existe)",oldUser, password);
     if (!oldUser) {
-      console.log("Usuario no encontrado");
+      console.log("Usuario no encontrado. Voy a crear uno con la mierda que me has pasado... Cuando llegará la revelión de las máquinas... (bip bip bip, y tal)");
       let hashedPassword = await bcrypt.hash(password, 12);
       const newUser = await User.create({ userName, password: hashedPassword });
       const token = jwt.sign(
