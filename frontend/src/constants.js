@@ -1,103 +1,92 @@
-
-
-
-const pl1 = "🤪";
-const pl2 = "🐷";
-
-const TURNS = {
-  X: pl1,
-  O: pl2,
-};
-
 const WINNER_COMBOS = [
-  [0, 1, 2],
-  [3, 4, 5],
-  [6, 7, 8],
-  [0, 3, 6],
-  [1, 4, 7],
-  [2, 5, 8],
-  [0, 4, 8],
-  [2, 4, 6],
+	[0, 1, 2],
+	[3, 4, 5],
+	[6, 7, 8],
+	[0, 3, 6],
+	[1, 4, 7],
+	[2, 5, 8],
+	[0, 4, 8],
+	[2, 4, 6],
 ];
 
 export const checkWinner = (boardToCheck) => {
-  for (const combo of WINNER_COMBOS) {
-    const [a, b, c] = combo;
-    if (
-      boardToCheck[a] && //0 -> X ó O
-      boardToCheck[a] === boardToCheck[b] && // 0 y 3 -> X -> X ó O -> O
-      boardToCheck[a] === boardToCheck[c] // 0
-    ) {
-      const winner = boardToCheck[a];
-      return winner;
-    }
-  }
-  return null;
+	for (const combo of WINNER_COMBOS) {
+		const [a, b, c] = combo;
+		if (
+			boardToCheck[a] && //0 -> X ó O
+			boardToCheck[a] === boardToCheck[b] && // 0 y 3 -> X -> X ó O -> O
+			boardToCheck[a] === boardToCheck[c] // 0
+		) {
+			const winner = boardToCheck[a];
+			return winner;
+		}
+	}
+	return null;
 };
 
 export const checkTie = (boardToCheck) => {
-  return boardToCheck.every((cell) => cell !== null);
+	return boardToCheck.every((cell) => cell !== null);
 };
 
 export const minimax = (
-  originalBoard,
-  depth,
-  isMaximizing,
-  player,
-  opponent
+	originalBoard,
+	depth,
+	isMaximizing,
+	player,
+	opponent
 ) => {
-  const board = [...originalBoard];
+	const board = [...originalBoard];
 
-  if (checkWinner(board) === player) {
-    return 7 - depth;
-  } else if (checkWinner(board) === opponent) {
-    return depth - 7;
-  } else if (checkTie(board)) {
-    return 0;
-  }
+	if (checkWinner(board) === player) {
+		return 6 - depth;
+	} else if (checkWinner(board) === opponent) {
+		return depth - 6;
+	} else if (checkTie(board)) {
+		return 0;
+	}
 
-  if (isMaximizing) {
-    let maxEval = -Infinity;
-    let bestMove = -1;
+	if (isMaximizing) {
+		let maxEval = -Infinity;
+		let bestMove = -1;
 
-    for (let i = 0; i < board.length; i++) {
-      if (board[i] === null) {
-        board[i] = player;
-        let evaluation = minimax(board, depth + 1, false, player, opponent);
-        board[i] = null;
+		for (let i = 0; i < board.length; i++) {
+			if (board[i] === null) {
+				board[i] = player;
+				let evaluation = minimax(board, depth + 1, false, player, opponent);
+				board[i] = null;
 
-        if (evaluation > maxEval) {
-          maxEval = evaluation;
-          bestMove = i;
-        }
-      }
-    }
+				if (evaluation > maxEval) {
+					maxEval = evaluation;
+					bestMove = i;
+				}
+			}
+		}
 
-    if (depth === 0) {
-      // Si estamos en el nivel superior, devuelve la mejor jugada
-      return bestMove;
-    }
+		if (depth === 0) {
+			// Si estamos en el nivel superior, devuelve la mejor jugada
+			return bestMove;
+		}
 
-    return maxEval;
-  } else {
-    let minEval = Infinity;
-    let bestMove = -1;
+		return maxEval;
+	} else {
+		let minEval = Infinity;
+		let bestMove = -1;
 
-    for (let i = 0; i < board.length; i++) {
-      if (board[i] === null) {
-        board[i] = opponent;
-        let evaluation = minimax(board, depth + 1, true, player, opponent);
-        board[i] = null;
+		for (let i = 0; i < board.length; i++) {
+			if (board[i] === null) {
+				board[i] = opponent;
+				let evaluation = minimax(board, depth + 1, true, player, opponent);
+				board[i] = null;
 
-        if (evaluation < minEval) {
-          minEval = evaluation;
-          bestMove = i;
-        }
-      }
-    }
+				if (evaluation < minEval) {
+					minEval = evaluation;
+					bestMove = i;
+				}
+			}
+		}
 
-    return minEval;
-  }
+		return minEval;
+	}
 };
 
-export { TURNS, WINNER_COMBOS };
+export { WINNER_COMBOS };

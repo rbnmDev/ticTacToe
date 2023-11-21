@@ -23,7 +23,7 @@ const Ranking = () => {
         console.error("No se puede obtener la puntuación");
       } else {
         const data = await response.json();
-        console.log("CERVEZA GRATIS", data);
+        console.log("CERVEZA GRATIS!! Soy un console.log del RANKING, tu!", data);
         setTopScores(data);
       }
     } catch (error) {

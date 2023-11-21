@@ -1,30 +1,42 @@
 import React, { useEffect, useState } from "react";
 import confetti from "canvas-confetti";
 import { backend_url } from "./config.js";
-import { TURNS, minimax, checkWinner, checkTie } from "./constants.js";
+import { minimax, checkWinner, checkTie } from "./constants.js";
 import "/styles/index.css";
 
 import Square from "./components/Square.jsx";
 import Login from "./components/Login.jsx";
 import Logout from "./components/Logout.jsx";
 import Ranking from "./components/Rank.jsx";
+import EmojiSelectPlayer from "./components/EmojiSelectPlayer.jsx";
+
+
+
 
 
 function App() {
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [selectedEmoji, setSelectedEmoji] = useState(); // Nuevo estado para el emoji seleccionado
+
+  const pl1 = selectedEmoji; // Usa selectedEmoji en lugar de pl1
+  const pl2 = "🐷";
+
+  const TURNS = {
+    X: pl1,
+    O: pl2,
+  };
+
 
   const [board, setBoard] = useState(Array(9).fill(null));
-  const [turn, setTurn] = useState(TURNS.X);
+  const [turn, setTurn] = useState(TURNS.X); // Cambiar o perdedor o random
   const [winner, setWinner] = useState(null);
 
+
   const [userName, setUserName] = useState(localStorage.getItem("userName"));
-  const [totalGames, setTotalGames] = useState(
-    localStorage.getItem("totalGames")
-  ); // Cuando llega esto al localStorage???
-  const [score, setScore] = useState(localStorage.getItem("score")); // Aunque viene de Login... cuando llega esto al localStorage??
+  const [score, setScore] = useState(localStorage.getItem("score"));
 
   const [gameEnded, setGameEnded] = useState(false);
-
 
   const resetGame = () => {
     setBoard(Array(9).fill(null));
@@ -89,6 +101,7 @@ function App() {
       userName,
       score: winner === TURNS.X ? 2 : winner === false ? 1 : 0,
     };
+
     try {
       const response = await fetch(`${backend_url}/addScore`, {
         method: "POST",
@@ -98,12 +111,12 @@ function App() {
         },
         body: JSON.stringify(updateUser),
       });
+
       if (!response.ok) {
         console.error("Me gusta montón el tuerking");
       } else {
         console.log("Datos del usuario actualizados con éxito en el servidor.");
         const data = await response.json();
-        setTotalGames(data.totalGames);
         setScore(data.score);
       }
     } catch (error) {
@@ -113,80 +126,104 @@ function App() {
 
   const handleLoginSuccess = () => {
     setUserName(localStorage.getItem("userName"));
-    setTotalGames(localStorage.getItem("totalGames"));
     setScore(localStorage.getItem("score"));
     setIsLoggedIn(true);
   };
 
+  const handleEmojiSuccess = (emoji) => {
+    setSelectedEmoji(emoji); // Almacena el emoji seleccionado en el estado
+  };
 
-  //COMPONENTE PRINCIPAL DE LA APP
+  //COMPONENTE PRINCIPAL DE LA APP ------------------------------------- 🍆
   return (
     <>
       {isLoggedIn ? (
-        <main className="board">
-          {/************* GAME'S HEADER *************/}
-          <h2 id="userName">{userName}</h2>
-          <h4 id="score">Score: {score}</h4>
-          <h4 id="rank">Ranking: {"rank"}</h4>
+        selectedEmoji ? (
+          <main className='board'>
+            {/************* GAME'S HEADER *************/}
+            <h1>PIG TAC TOE</h1>
+            <h2 id='userName'>{userName}</h2>
+            <h4 id='score'>Score: {score}</h4>
+            <h4 id='rank'>Ranking: {"rank"}</h4>
 
-          {/************* GAME'S BOARD *************/}
-          <section className="game">
-            {board.map((square, index) => {
-              return (
-                <Square key={index} index={index} updateBoard={handleClick}>
-                  {square}
-                </Square>
-              );
-            })}
-          </section>
+            {/************* GAME'S BOARD *************/}
+            <section className='game'>
+              {board.map((square, index) => {
+                return (
+                  <Square
+                    key={index}
+                    index={index}
+                    updateBoard={handleClick}
+                  >
+                    {square}
+                  </Square>
+                );
+              })}
+            </section>
 
-          {/************* TURN DISPLAY *************/}
-          <section className="turn">
-            <Square isSelected={turn === TURNS.X} className="turnX">
-              {TURNS.X}
-            </Square>
-            <Square isSelected={turn === TURNS.O} className="turnO">
-              {TURNS.O}
-            </Square>
-          </section>
+            {/************* TURN DISPLAY *************/}
+            <section className='turn'>
+              <Square
+                isSelected={turn === TURNS.X}
+                className='turnX'
+              >
+                {selectedEmoji}
+              </Square>
 
-          <section className="winnerEnd">
-            {winner !== null && (
-              <section className="winner">
-                <div className="text">
-                  <h2>{winner === false ? "EMPATE" : "GANADOR"}</h2>
+              <Square
+                isSelected={turn === TURNS.O}
+                className='turnO'
+              >
+                {TURNS.O}
+              </Square>
+            </section>
 
-                  <header>{winner && <Square>{winner}</Square>}</header>
-                  <div>
-                    <button id="reset" onClick={resetGame}>
-                      Reiniciar
-                    </button>
+            {/************* ENDGAME DISPLAY *************/}
+            <section className='winnerEnd'>
+              {winner !== null && (
+                <section className='winner'>
+                  <div className='text'>
+                    <h2>{winner === false ? "EMPATE" : "GANADOR"}</h2>
+
+                    <header>{winner && <Square>{winner}</Square>}</header>
+                    <div>
+                      <button
+                        className='button__reset'
+                        onClick={resetGame}
+                      >
+                        Reiniciar
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </section>
-            )}
-          </section>
+                </section>
+              )}
+            </section>
 
-          <section className="buttons__area">
-            <button onClick={resetGame}>Reiniciar</button>
-            <Logout />
-          </section>
-
-        </main>
+            <section className='buttons__area'>
+              <button
+                className='button__reset'
+                onClick={resetGame}
+              >
+                Reiniciar
+              </button>
+              <Logout />
+            </section>
+            <Ranking key={winner} />
+          </main>
+        ) : (
+          <EmojiSelectPlayer onEmojiSuccess={handleEmojiSuccess} />
+        )
       ) : (
         <>
-
           <Login onLoginSuccess={handleLoginSuccess} />
-
+          <Ranking key={winner} />
         </>
       )}
-      {/************* SECCIÓN DEL RANKING *************/}
-
-      <Ranking key={winner} />
-
     </>
   );
 }
 
 
 export default App;
+
+
